@@ -45,6 +45,8 @@ _logger = logging.getLogger('keyvault-agent')
 
 AZURE_AUTHORITY_SERVER = os.getenv('AZURE_AUTHORITY_SERVER', 'https://login.microsoftonline.com/')
 VAULT_RESOURCE_NAME = os.getenv('VAULT_RESOURCE_NAME', 'https://vault.azure.net')
+VALIDATE_AUTHORITY = os.getenv('VALIDATE_AUTHORITY', 'true')
+
 
 class KeyVaultAgent(object):
     """
@@ -83,7 +85,7 @@ class KeyVaultAgent(object):
             self._parse_sp_file()
             authority = '/'.join([AZURE_AUTHORITY_SERVER.rstrip('/'), self.tenant_id])
             _logger.info('Using authority: %s', authority)
-            context = AuthenticationContext(authority)
+            context = AuthenticationContext(authority, validate_authority=VALIDATE_AUTHORITY.lower() != "false")
             _logger.info('Using vault resource name: %s and client id: %s', VAULT_RESOURCE_NAME, self.client_id)
             credentials = AdalAuthentication(context.acquire_token_with_client_credentials, VAULT_RESOURCE_NAME,
                                              self.client_id, self.client_secret)
